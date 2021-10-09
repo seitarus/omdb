@@ -1,9 +1,9 @@
 //
-//  TopStoriesListTableViewCell.swift
-//  CodingTest
+//  MoviesListTableViewCell.swift
+//  OMDB
 //
-//  Created by faizal on 07/10/18.
-//  Copyright © 2018 test. All rights reserved.
+//  Created by Alex on 09/10/21.
+//  Copyright © 2021 test. All rights reserved.
 //
 
 import Foundation

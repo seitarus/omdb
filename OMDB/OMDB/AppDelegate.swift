@@ -2,7 +2,8 @@
 //  AppDelegate.swift
 //  OMDB
 //
-//  Created by iMac 27 iOS on 9/10/21.
+//  Created by Alex on 09/10/21.
+//  Copyright © 2021 test. All rights reserved.
 //
 
 import UIKit
