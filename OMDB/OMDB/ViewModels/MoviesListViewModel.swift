@@ -10,7 +10,9 @@ import Foundation
 
 class MoviesListViewModel {
     
-    private var movies: [Movie] = [Movie]()
+    let apiService: APIServiceProtocol
+    
+    private var movies: [MovieShort] = [MovieShort]()
     
     private var cellViewModels: [MovieListCellViewModel] = [MovieListCellViewModel]() {
         didSet {
@@ -38,11 +40,39 @@ class MoviesListViewModel {
     var showAlertClosure: (()->())?
     var updateLoadingStatus: (()->())?
     
-    func initFetch() {
-//        self.isLoading = true
+    init( apiService: APIServiceProtocol = APIService()) {
+        self.apiService = apiService
+    }
+    
+    func searchMovies(for name: String) {
+        self.isLoading = true
         
-        //TODO: Call API
-        
+        apiService.searchMovies(for: name) { [weak self] movies, error in
+            
+            self?.isLoading = false
+            
+            if let error = error {
+                self?.alertMessage = error.localizedDescription
+            }
+                
+//            print(movies);
+                
+            self?.processFetchedMovies(movies: movies)
+        }
+    }
+    
+    func createCellViewModel( movie: MovieShort ) -> MovieListCellViewModel {
+                
+        return MovieListCellViewModel(titleText: movie.title, yearText: movie.year, imageUrl: movie.poster)
+    }
+    
+    private func processFetchedMovies( movies: [MovieShort] ) {
+        self.movies = movies // Cache
+        var vms = [MovieListCellViewModel]()
+        for movie in movies {
+            vms.append( createCellViewModel(movie: movie) )
+        }
+        self.cellViewModels = vms
     }
     
     func getCellViewModel( at indexPath: IndexPath ) -> MovieListCellViewModel {
@@ -52,7 +82,7 @@ class MoviesListViewModel {
 
 struct MovieListCellViewModel {
     let titleText: String
-    let directorText: String
+    let yearText: String
     let imageUrl: String
 }
 

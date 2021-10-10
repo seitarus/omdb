@@ -8,24 +8,24 @@
 
 import Foundation
 
-struct MoviesResponse : Codable {
-	let search : [Movie]?
-	let totalResults : String?
-	let response : String?
-	
-	enum CodingKeys: String, CodingKey {
+struct MoviesResponse: Codable {
+    let search: [MovieShort]?
+    let totalResults: String?
+    let response: String
+    let error: String?
 
-		case search = "Search"
-		case totalResults = "totalResults"
-		case response = "Response"
-	}
-
-	init(from decoder: Decoder) throws {
-		let values = try decoder.container(keyedBy: CodingKeys.self)
-        search = try values.decodeIfPresent([Movie].self, forKey: .search)
-        totalResults = try values.decodeIfPresent(String.self, forKey: .totalResults)
-        response = try values.decodeIfPresent(String.self, forKey: .response)
-		
-	}
-
+    enum CodingKeys: String, CodingKey {
+        case search = "Search"
+        case totalResults
+        case response = "Response"
+        case error = "Error"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        search       = try container.decodeIfPresent([MovieShort].self, forKey: .search)
+        totalResults = try container.decodeIfPresent(String.self, forKey: .totalResults)
+        response     = try container.decode(String.self, forKey: .response)
+        error        = try container.decodeIfPresent(String.self, forKey: .error)
+    }
 }

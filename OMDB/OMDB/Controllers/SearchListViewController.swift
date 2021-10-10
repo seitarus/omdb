@@ -7,11 +7,13 @@
 //
 
 import UIKit
+import AlamofireImage
 
 class SearchListViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     lazy var viewModel: MoviesListViewModel = {
         return MoviesListViewModel()
@@ -31,10 +33,14 @@ class SearchListViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         self.navigationItem.title = Strings.homeTitle
 
+        if let searchText = searchBar.text, !searchText.isEmpty {
+          return
+        }
     }
     
     //Mark: Setup View Methods
     func initView() {
+        searchBar.delegate = self
         tableView.estimatedRowHeight = 140
         tableView.rowHeight = UITableView.automaticDimension
     }
@@ -73,8 +79,6 @@ class SearchListViewController: UIViewController {
             }
         }
         
-        viewModel.initFetch()
-        
     }
     
     func showAlert( _ message: String ) {
@@ -97,7 +101,19 @@ extension SearchListViewController: UITableViewDelegate, UITableViewDataSource {
             fatalError("Cell not exists in storyboard")
         }
         
-             
+        let cellVM = viewModel.getCellViewModel( at: indexPath )
+
+        cell.lblTittle.text = cellVM.titleText
+        cell.lblYear.text = cellVM.yearText
+//        cell.imageMovie.image = UIImage(named: "placeholder")
+        
+        
+        let url = URL(string: cellVM.imageUrl)!
+        let placeholderImage = UIImage(named: "placeholder")!
+
+        cell.imageMovie.af.setImage(withURL: url, placeholderImage: placeholderImage)
+//        cell.imageTopStory.imageFromServerURL(cellVM.imageUrl,placeHolder: UIImage(named: "placeholder"))
+        
         return cell
         
     }
@@ -116,3 +132,22 @@ extension SearchListViewController: UITableViewDelegate, UITableViewDataSource {
 
 }
 
+// MARK: - UISearchBarDelegate
+extension SearchListViewController: UISearchBarDelegate {
+    
+  func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+    guard let query = searchBar.text else {
+      return
+    }
+    
+      viewModel.searchMovies(for: query)
+  }
+
+  func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    
+      searchBar.text = nil
+      searchBar.resignFirstResponder()
+    
+  }
+    
+}

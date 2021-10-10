@@ -10,10 +10,10 @@ import Foundation
 import UIKit
 
 class MoviesListTableViewCell: UITableViewCell {
-    @IBOutlet weak var imageTopStory: UIImageView!
+    @IBOutlet weak var imageMovie: UIImageView!
     
     @IBOutlet weak var lblTittle: UILabel!
     
-    @IBOutlet weak var lblAuthor: UILabel!
+    @IBOutlet weak var lblYear: UILabel!
     
 }
