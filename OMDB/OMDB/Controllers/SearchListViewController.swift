@@ -47,6 +47,8 @@ class SearchListViewController: UIViewController {
         tableView.prefetchDataSource = self
         
         activityIndicator.style = .large
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.color = ColorPalette.RWGreen
     }
     
     func initVM() {
@@ -78,7 +80,7 @@ extension SearchListViewController: UITableViewDelegate, UITableViewDataSource {
         if isLoadingCell(for: indexPath) {
           cell.configure(with: .none)
         } else {
-          cell.configure(with: viewModel.movie(at: indexPath.row))
+          cell.configure(with: viewModel.getMovie(at: indexPath.row))
         }
         
         return cell

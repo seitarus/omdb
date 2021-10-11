@@ -54,6 +54,8 @@ class MovieDetailViewController: UIViewController {
         self.lblWeb.text         = ""
         
         activityIndicator.style = .large
+        activityIndicator.hidesWhenStopped = true
+        activityIndicator.color = ColorPalette.RWGreen
     }
     
     func initVM() {

@@ -25,12 +25,12 @@ class MoviesListViewModel {
     
     private var movies: [MovieShort] = []
     
-    func movie(at index: Int) -> MovieShort {
+    func getMovie(at index: Int) -> MovieShort {
       return movies[index]
     }
         
-    init( delegate: MoviesListViewModelDelegate ) {
-        self.apiService = APIService()
+    init( apiService: APIServiceProtocol = APIService(), delegate: MoviesListViewModelDelegate ) {
+        self.apiService = apiService
         self.delegate = delegate
     }
     

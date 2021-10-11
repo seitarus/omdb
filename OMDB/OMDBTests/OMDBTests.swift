@@ -1,8 +1,9 @@
 //
 //  OMDBTests.swift
-//  OMDBTests
+//  OMDB
 //
-//  Created by iMac 27 iOS on 9/10/21.
+//  Created by Alex on 09/10/21.
+//  Copyright © 2021 test. All rights reserved.
 //
 
 import XCTest
@@ -10,24 +11,37 @@ import XCTest
 
 class OMDBTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    var sut: APIService?
+    
+    override func setUp() {
+        super.setUp()
+        sut = APIService()
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    override func tearDown() {
+        sut = nil
+        super.tearDown()
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    
+    func test_search_movie() {
+        
+        // Given A apiservice
+        let sut = self.sut!
+        
+        // When fetch top stories
+        let expect = XCTestExpectation(description: "callback")
+        
+        let name = "batman"
+        let currentPage = 1
+        
+        sut.searchMovies(for: name, page: currentPage) { (movies, total, error) in
+            expect.fulfill()
+            for movie in movies {
+                XCTAssertNotNil(movie)
+            }
         }
+        
+        wait(for: [expect], timeout: 3.1)
     }
 
 }
