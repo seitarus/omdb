@@ -16,7 +16,7 @@ class SearchListViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     lazy var viewModel: MoviesListViewModel = {
-        return MoviesListViewModel()
+        return MoviesListViewModel( delegate: self )
     }()
     
     override func viewDidLoad() {
@@ -24,10 +24,7 @@ class SearchListViewController: UIViewController {
         
         // Init the static view
         initView()
-        
-        // init view model
-        initVM()
-        
+                
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -49,12 +46,6 @@ class SearchListViewController: UIViewController {
         activityIndicator.style = .large
         activityIndicator.hidesWhenStopped = true
         activityIndicator.color = ColorPalette.RWGreen
-    }
-    
-    func initVM() {
-        
-        viewModel = MoviesListViewModel( delegate: self )
-        
     }
     
     func showAlert( _ message: String ) {
@@ -141,6 +132,18 @@ extension SearchListViewController: MoviesListViewModelDelegate {
   }
 }
 
+private extension SearchListViewController {
+  func isLoadingCell(for indexPath: IndexPath) -> Bool {
+    return indexPath.row >= viewModel.currentCount
+  }
+  
+  func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
+    let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+    let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+    return Array(indexPathsIntersection)
+  }
+}
+
 // MARK: - UISearchBarDelegate
 extension SearchListViewController: UISearchBarDelegate {
     
@@ -172,14 +175,4 @@ extension SearchListViewController {
     }
 }
 
-private extension SearchListViewController {
-  func isLoadingCell(for indexPath: IndexPath) -> Bool {
-    return indexPath.row >= viewModel.currentCount
-  }
-  
-  func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
-    let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
-    let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
-    return Array(indexPathsIntersection)
-  }
-}
+

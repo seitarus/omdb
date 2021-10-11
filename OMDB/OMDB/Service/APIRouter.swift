@@ -41,7 +41,7 @@ enum APIRouter {
     var parameters: [String: String]? {
         switch self {
         case .searchMovies(let term, let page):
-            return ["s": term, "p": String(page)]
+            return ["s": term, "page": String(page)]
         case .fetchMovie(let imdbId):
             return ["i": imdbId]
         }
