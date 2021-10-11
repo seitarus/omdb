@@ -4,6 +4,12 @@ Poryecto de ejemplo de cómo usar la API de OMDB.
 Este proyecto de ejemplo esta desarrollado con XCode 13.0 y en el lenguaje Swift 5, usando la arquitectura MVVM. 
 La APP muestra una pantalla principal en la que se puede realizar una búsqueda por título de película y se consulta a la API de OMDB (https://www.omdbapi.com) Desde el listado de resultados se puede acceder a una pantalla de detalle de cada película. Unit Test for the Api call is also Included in this sample project.
 
+En la pantalla de detalle:
+- al pulsar sobre la imagen esta se abrirá en un modal a pantalla completa y se podrá compartir.
+- al hacer una pulsación prolongada en cada texto este se copiará al portapapeles.
+- si seha obtenido la web de la pelicula esta se podrá compartir pulsando el botón situado en la parte derecha de la barra de navegación.
+
+
 # Qué es MVVM ?
 
 MVVM fue propuesto por John Gossman en 2005. El propósito principal de MVVM es mover el estado de los datos de la Vista al Modelo de Vista.
@@ -12,8 +18,9 @@ Según la definición, la Vista consta únicamente de elementos visuales. En la 
 
 # Screen shots
 
-![solarized dualmode](https://github.com/seitarus/omdb/blob/main/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.00.png)
-![solarized dualmode](https://github.com/seitarus/omdb/blob/main/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.05.png)
+![HomeScreen](https://github.com/seitarus/omdb/blob/main/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.00.png)
+|
+![DetailScreen](https://github.com/seitarus/omdb/blob/main/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.05.png)
 
 # Archivos principales
 
