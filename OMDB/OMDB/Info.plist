@@ -21,5 +21,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Enable photo library access to save images to your photo library directly from the app.</string>
 </dict>
 </plist>

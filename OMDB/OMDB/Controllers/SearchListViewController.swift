@@ -41,43 +41,17 @@ class SearchListViewController: UIViewController {
     //Mark: Setup View Methods
     func initView() {
         searchBar.delegate = self
+        
         tableView.estimatedRowHeight = 140
         tableView.rowHeight = UITableView.automaticDimension
+        tableView.prefetchDataSource = self
+        
+        activityIndicator.style = .large
     }
     
     func initVM() {
         
-        // Naive binding
-        viewModel.showAlertClosure = { [weak self] () in
-            DispatchQueue.main.async {
-                if let message = self?.viewModel.alertMessage {
-                    self?.showAlert( message )
-                }
-            }
-        }
-        
-        viewModel.updateLoadingStatus = { [weak self] () in
-            DispatchQueue.main.async {
-                let isLoading = self?.viewModel.isLoading ?? false
-                if isLoading {
-                    self?.activityIndicator.startAnimating()
-                    UIView.animate(withDuration: 0.2, animations: {
-                        self?.tableView.alpha = 0.0
-                    })
-                }else {
-                    self?.activityIndicator.stopAnimating()
-                    UIView.animate(withDuration: 0.2, animations: {
-                        self?.tableView.alpha = 1.0
-                    })
-                }
-            }
-        }
-        
-        viewModel.reloadTableViewClosure = { [weak self] () in
-            DispatchQueue.main.async {
-                self?.tableView.reloadData()
-            }
-        }
+        viewModel = MoviesListViewModel( delegate: self )
         
     }
     
@@ -101,18 +75,11 @@ extension SearchListViewController: UITableViewDelegate, UITableViewDataSource {
             fatalError("Cell not exists in storyboard")
         }
         
-        let cellVM = viewModel.getCellViewModel( at: indexPath )
-
-        cell.lblTittle.text = cellVM.titleText
-        cell.lblYear.text = cellVM.yearText
-//        cell.imageMovie.image = UIImage(named: "placeholder")
-        
-        
-        let url = URL(string: cellVM.imageUrl)!
-        let placeholderImage = UIImage(named: "placeholder")!
-
-        cell.imageMovie.af.setImage(withURL: url, placeholderImage: placeholderImage)
-//        cell.imageTopStory.imageFromServerURL(cellVM.imageUrl,placeHolder: UIImage(named: "placeholder"))
+        if isLoadingCell(for: indexPath) {
+          cell.configure(with: .none)
+        } else {
+          cell.configure(with: viewModel.movie(at: indexPath.row))
+        }
         
         return cell
         
@@ -123,13 +90,53 @@ extension SearchListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.numberOfCells
+        return viewModel.totalCount
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableView.automaticDimension
     }
+    
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        
+        self.viewModel.userPressed(at: indexPath)
+        return indexPath
+       
+    }
 
+}
+
+extension SearchListViewController: UITableViewDataSourcePrefetching {
+  func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+    if indexPaths.contains(where: isLoadingCell) {
+        guard let query = searchBar.text else {
+          return
+        }
+        
+        viewModel.searchMovies(for: query)
+    }
+  }
+}
+
+extension SearchListViewController: MoviesListViewModelDelegate {
+  func onFetchCompleted(with newIndexPathsToReload: [IndexPath]?) {
+    
+    guard let newIndexPathsToReload = newIndexPathsToReload else {
+      activityIndicator.stopAnimating()
+      tableView.isHidden = false
+      tableView.reloadData()
+      return
+    }
+    
+    let indexPathsToReload = visibleIndexPathsToReload(intersecting: newIndexPathsToReload)
+    tableView.reloadRows(at: indexPathsToReload, with: .automatic)
+  }
+  
+  func onFetchFailed(with reason: String) {
+      activityIndicator.stopAnimating()
+    
+      showAlert(reason)
+  }
 }
 
 // MARK: - UISearchBarDelegate
@@ -141,6 +148,7 @@ extension SearchListViewController: UISearchBarDelegate {
     }
     
       viewModel.searchMovies(for: query)
+      searchBar.resignFirstResponder()
   }
 
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -149,5 +157,27 @@ extension SearchListViewController: UISearchBarDelegate {
       searchBar.resignFirstResponder()
     
   }
-    
+}
+
+// MARK: - Navigation
+extension SearchListViewController {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? MovieDetailViewController,
+            let movieDetailImdbId = viewModel.selectedMovieImdbID {
+            vc.movieDetailImdbId = movieDetailImdbId
+                        
+        }
+    }
+}
+
+private extension SearchListViewController {
+  func isLoadingCell(for indexPath: IndexPath) -> Bool {
+    return indexPath.row >= viewModel.currentCount
+  }
+  
+  func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
+    let indexPathsForVisibleRows = tableView.indexPathsForVisibleRows ?? []
+    let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+    return Array(indexPathsIntersection)
+  }
 }

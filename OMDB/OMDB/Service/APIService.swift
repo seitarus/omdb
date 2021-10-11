@@ -10,82 +10,78 @@ import Alamofire
 
 protocol APIServiceProtocol {
     
-    func searchMovies(for name: String, complete: @escaping ( _ movies: [MovieShort], _ error: Error? )->() )
+    func searchMovies(for name: String, page: Int, complete: @escaping ( _ movies: [MovieShort], _ total: Int, _ error: Error? )->() )
+    func fetchMovie(by imdbId: String, complete: @escaping ( _ movie: Movie?, _ error: Error? )->() )
     
 }
 
-class UrlComponents {
-    
-    let path: String
-    let baseUrlString = "https://www.omdbapi.com/?"
-    let apiKey = "5681b4b6"
-    let searchQuery: String?
-    
-    var url: URL {
-        var query = [String]()
-        if let searchQuery = searchQuery {
-            query.append("s=\(searchQuery)")
-        }
-        query.append("apikey=\(apiKey)")
+struct APIService: APIServiceProtocol {
+      
+    func searchMovies(for name: String, page: Int, complete: @escaping ( [MovieShort], Int, Error?) -> ()) {
         
-        guard let composedUrl = URL(string: "?" + query.joined(separator: "&"), relativeTo: NSURL(string: baseUrlString + path + "?") as URL?) else {
-            fatalError("Unable to build request url")
-        }
-        
-        return composedUrl
-    }
-    
-    init(path: String, query: String? = nil) {
-        self.path = path
-        guard var query = query else {
-            self.searchQuery = nil
-            return
-        }
-        
-        query = query.replacingOccurrences(of: " ", with: "+")
-        self.searchQuery = query
-    }
-}
-
-class APIService: APIServiceProtocol {
-    
-    func searchMovies(for name: String, complete: @escaping ( [MovieShort], Error?) -> ()) {
-        
-        let urlComponents = UrlComponents(path: "", query: name)
-        
-        AF.request(urlComponents.url).validate()
+        AF.request(APIRouter.searchMovies(name, page)).validate()
           .responseDecodable(of: MoviesResponse.self) { response in
               
               // Controlar error en la respuesta
               if let error = response.error {
-                  return complete( [], error)
+                  return complete( [], 0, error)
               }
               
               // Controlar que la API devuelva contenido
-              guard let result = response.value else { return complete( [], nil) }
+              guard let result = response.value else { return complete( [], 0, nil) }
             
               guard let list = result.search else {
                   
                   if let error = result.error {
                       // La peticion es correcta pero no hay resultados de la busqueda
                                             
-                      return complete( [], NSError(domain: "", code: 401, userInfo: [
+                      return complete( [], 0, NSError(domain: "", code: 401, userInfo: [
                         NSLocalizedDescriptionKey :  NSLocalizedString("Not Found", value: error, comment: "") ,
                         NSLocalizedFailureReasonErrorKey : NSLocalizedString("Not Found", value: error, comment: "")
                         ]))
                   }
                   
-                  return complete( [], NSError(domain: "", code: 401, userInfo: [
+                  return complete( [], 0, NSError(domain: "", code: 401, userInfo: [
                     NSLocalizedDescriptionKey :  NSLocalizedString("No Results", value: "No results", comment: "") ,
                     NSLocalizedFailureReasonErrorKey : NSLocalizedString("No Results", value: "No results", comment: "")
                     ]))
               }
               
-              //
-              complete( list, nil)
+              var total = 1
+              if let totalResults = result.totalResults {
+                  total = Int(totalResults) ?? 1
+              }
+                        
+
+              complete( list, total, nil)
         }
         
     }
     
+    func fetchMovie(by imdbId: String, complete: @escaping (Movie?, Error?) -> ()) {
+        
+        AF.request(APIRouter.fetchMovie(imdbId)).validate()
+            .responseDecodable(of: Movie.self) { response in
+                
+                // Controlar error en la respuesta
+                if let error = response.error {
+                    return complete( nil, error)
+                }
+                
+                // Controlar que la API devuelva contenido
+                guard let movie = response.value else { return complete( nil, nil) }
+                
+                if let error = movie.error {
+                    // La peticion es correcta pero no se ha encontrado el elemento
+                    
+                    return complete( nil, NSError(domain: "", code: 401, userInfo: [
+                        NSLocalizedDescriptionKey :  NSLocalizedString("Not Found", value: error, comment: "") ,
+                        NSLocalizedFailureReasonErrorKey : NSLocalizedString("Not Found", value: error, comment: "")
+                    ]))
+                }
+                
+                complete( movie, nil)
+            }
+    }
 
 }

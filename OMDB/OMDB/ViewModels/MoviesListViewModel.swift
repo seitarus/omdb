@@ -8,87 +8,93 @@
 
 import Foundation
 
+protocol MoviesListViewModelDelegate: AnyObject {
+  func onFetchCompleted(with newIndexPathsToReload: [IndexPath]?)
+  func onFetchFailed(with reason: String)
+}
+
 class MoviesListViewModel {
+    
+    private weak var delegate: MoviesListViewModelDelegate?
     
     let apiService: APIServiceProtocol
     
-    private var movies: [MovieShort] = [MovieShort]()
+    var currentPage = 1
+    var total = 0
+    var isFetchInProgress = false
     
-    private var cellViewModels: [MovieListCellViewModel] = [MovieListCellViewModel]() {
-        didSet {
-            self.reloadTableViewClosure?()
-        }
+    private var movies: [MovieShort] = []
+    
+    func movie(at index: Int) -> MovieShort {
+      return movies[index]
+    }
+        
+    init( delegate: MoviesListViewModelDelegate ) {
+        self.apiService = APIService()
+        self.delegate = delegate
     }
     
-    var isLoading: Bool = false {
-        didSet {
-            self.updateLoadingStatus?()
-        }
+    var totalCount: Int {
+      return total
     }
     
-    var alertMessage: String? {
-        didSet {
-            self.showAlertClosure?()
-        }
+    var currentCount: Int {
+      return movies.count
     }
     
-    var numberOfCells: Int {
-        return cellViewModels.count
-    }
-    
-    var reloadTableViewClosure: (()->())?
-    var showAlertClosure: (()->())?
-    var updateLoadingStatus: (()->())?
+    var selectedMovieImdbID: String?
     
     init( apiService: APIServiceProtocol = APIService()) {
         self.apiService = apiService
     }
     
     func searchMovies(for name: String) {
-        self.isLoading = true
         
-        apiService.searchMovies(for: name) { [weak self] movies, error in
-            
-            self?.isLoading = false
+        guard !isFetchInProgress else {
+          return
+        }
+        
+        apiService.searchMovies(for: name, page: currentPage) { [weak self] movies, total, error in
             
             if let error = error {
-                self?.alertMessage = error.localizedDescription
+                
+                self?.isFetchInProgress = false
+                                
+                self?.delegate?.onFetchFailed(with: error.localizedDescription)
             }
                 
 //            print(movies);
-                
-            self?.processFetchedMovies(movies: movies)
+            self?.isFetchInProgress = false
+            
+            self?.total = total
+            
+            self?.movies.append(contentsOf: movies)
+            
+            if let page = self?.currentPage, page > 1 {
+                let indexPathsToReload = self?.calculateIndexPathsToReload(from: movies)
+                self?.delegate?.onFetchCompleted(with: indexPathsToReload)
+            } else {
+                self?.delegate?.onFetchCompleted(with: .none)
+            }
+            
+            self?.currentPage += 1
+            
         }
     }
     
-    func createCellViewModel( movie: MovieShort ) -> MovieListCellViewModel {
-                
-        return MovieListCellViewModel(titleText: movie.title, yearText: movie.year, imageUrl: movie.poster)
-    }
-    
-    private func processFetchedMovies( movies: [MovieShort] ) {
-        self.movies = movies // Cache
-        var vms = [MovieListCellViewModel]()
-        for movie in movies {
-            vms.append( createCellViewModel(movie: movie) )
-        }
-        self.cellViewModels = vms
-    }
-    
-    func getCellViewModel( at indexPath: IndexPath ) -> MovieListCellViewModel {
-        return cellViewModels[indexPath.row]
+    private func calculateIndexPathsToReload(from newMovies: [MovieShort]) -> [IndexPath] {
+      let startIndex = movies.count - newMovies.count
+      let endIndex = startIndex + newMovies.count
+      return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
     }
 }
 
-struct MovieListCellViewModel {
-    let titleText: String
-    let yearText: String
-    let imageUrl: String
-}
-
-struct MovieDetailViewModel {
-    let titleText: String
-    let directorText: String
-    let imageUrl: String
-    let detailsText :String
+extension MoviesListViewModel {
+    
+    func userPressed( at indexPath: IndexPath ){
+        
+        let movie = self.movies[indexPath.row]
+        
+        self.selectedMovieImdbID = movie.imdbID
+    }
 }

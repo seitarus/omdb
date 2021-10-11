@@ -18,6 +18,7 @@ struct Movie : Codable {
     let metascore, imdbRating, imdbVotes, imdbID: String?
     let type, dvd, boxOffice, production: String?
     let website, response: String?
+    let error: String?
     
     enum CodingKeys: String, CodingKey {
         case title = "Title"
@@ -43,35 +44,37 @@ struct Movie : Codable {
         case production = "Production"
         case website = "Website"
         case response = "Response"
+        case error = "Error"
     }
 
 	init(from decoder: Decoder) throws {
-		let values = try decoder.container(keyedBy: CodingKeys.self)
-		title = try values.decodeIfPresent(String.self, forKey: .title)
-		year = try values.decodeIfPresent(String.self, forKey: .year)
-        rated = try values.decodeIfPresent(String.self, forKey: .rated)
-        released = try values.decodeIfPresent(String.self, forKey: .released)
-        runtime = try values.decodeIfPresent(String.self, forKey: .runtime)
-        genre = try values.decodeIfPresent(String.self, forKey: .genre)
-        director = try values.decodeIfPresent(String.self, forKey: .director)
-        writer = try values.decodeIfPresent(String.self, forKey: .writer)
-        actors = try values.decodeIfPresent(String.self, forKey: .actors)
-        plot = try values.decodeIfPresent(String.self, forKey: .plot)
-        language = try values.decodeIfPresent(String.self, forKey: .language)
-        country = try values.decodeIfPresent(String.self, forKey: .country)
-        awards = try values.decodeIfPresent(String.self, forKey: .awards)
-        poster = try values.decodeIfPresent(String.self, forKey: .poster)
-        ratings = try values.decodeIfPresent([Rating].self, forKey: .poster)
-        metascore = try values.decodeIfPresent(String.self, forKey: .metascore)
-        imdbRating = try values.decodeIfPresent(String.self, forKey: .imdbRating)
-        imdbVotes = try values.decodeIfPresent(String.self, forKey: .imdbVotes)
-		imdbID = try values.decodeIfPresent(String.self, forKey: .imdbID)
-		type = try values.decodeIfPresent(String.self, forKey: .type)
-        dvd = try values.decodeIfPresent(String.self, forKey: .dvd)
-        boxOffice = try values.decodeIfPresent(String.self, forKey: .boxOffice)
-        production = try values.decodeIfPresent(String.self, forKey: .production)
-        website = try values.decodeIfPresent(String.self, forKey: .website)
-        response = try values.decodeIfPresent(String.self, forKey: .response)
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		title      = try container.decodeIfPresent(String.self, forKey: .title)
+		year       = try container.decodeIfPresent(String.self, forKey: .year)
+        rated      = try container.decodeIfPresent(String.self, forKey: .rated)
+        released   = try container.decodeIfPresent(String.self, forKey: .released)
+        runtime    = try container.decodeIfPresent(String.self, forKey: .runtime)
+        genre      = try container.decodeIfPresent(String.self, forKey: .genre)
+        director   = try container.decodeIfPresent(String.self, forKey: .director)
+        writer     = try container.decodeIfPresent(String.self, forKey: .writer)
+        actors     = try container.decodeIfPresent(String.self, forKey: .actors)
+        plot       = try container.decodeIfPresent(String.self, forKey: .plot)
+        language   = try container.decodeIfPresent(String.self, forKey: .language)
+        country    = try container.decodeIfPresent(String.self, forKey: .country)
+        awards     = try container.decodeIfPresent(String.self, forKey: .awards)
+        poster     = try container.decodeIfPresent(String.self, forKey: .poster)
+        ratings    = try container.decodeIfPresent([Rating].self, forKey: .ratings)
+        metascore  = try container.decodeIfPresent(String.self, forKey: .metascore)
+        imdbRating = try container.decodeIfPresent(String.self, forKey: .imdbRating)
+        imdbVotes  = try container.decodeIfPresent(String.self, forKey: .imdbVotes)
+		imdbID     = try container.decodeIfPresent(String.self, forKey: .imdbID)
+		type       = try container.decodeIfPresent(String.self, forKey: .type)
+        dvd        = try container.decodeIfPresent(String.self, forKey: .dvd)
+        boxOffice  = try container.decodeIfPresent(String.self, forKey: .boxOffice)
+        production = try container.decodeIfPresent(String.self, forKey: .production)
+        website    = try container.decodeIfPresent(String.self, forKey: .website)
+        response   = try container.decodeIfPresent(String.self, forKey: .response)
+        error      = try container.decodeIfPresent(String.self, forKey: .error)
 	}
 
 }
