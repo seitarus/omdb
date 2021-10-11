@@ -2,7 +2,9 @@
 Poryecto de ejemplo de cómo usar la API de OMDB.
 
 Este proyecto de ejemplo esta desarrollado con XCode 13.0 y en el lenguaje Swift 5, usando la arquitectura MVVM. 
-La APP muestra una pantalla principal en la que se puede realizar una búsqueda por título de película y se consulta a la API de OMDB (https://www.omdbapi.com) Desde el listado de resultados se puede acceder a una pantalla de detalle de cada película. Unit Test for the Api call is also Included in this sample project.
+La APP muestra una pantalla principal en la que se puede realizar una búsqueda por título de película y se consulta a la API de OMDB (https://www.omdbapi.com) Desde el listado de resultados se puede acceder a una pantalla de detalle de cada película. 
+
+Se han inlcuido Test Unitarios para la pantalla de búsqueda.
 
 En la pantalla de detalle:
 - al pulsar sobre la imagen esta se abrirá en un modal a pantalla completa y se podrá compartir.
