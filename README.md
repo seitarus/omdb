@@ -12,8 +12,8 @@ Según la definición, la Vista consta únicamente de elementos visuales. En la 
 
 # Screen shots
 
-![solarized dualmode](https://github.com/seitarus/omdb/blob/master/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%206s%20-%202018-10-09%20at%2012.32.02.png)
-![solarized dualmode](https://github.com/seitarus/omdb/blob/master/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%206s%20-%202018-10-09%20at%2012.36.47.png)
+![solarized dualmode](https://github.com/seitarus/omdb/blob/master/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.00.pnf)
+![solarized dualmode](https://github.com/seitarus/omdb/blob/master/Screen%20shots/Simulator%20Screen%20Shot%20-%20iPhone%2013%20-%202021-10-11%20at%2018.28.05)
 
 # Archivos principales
 
