@@ -35,8 +35,7 @@ class MovieDetailViewModel {
     var reloadViewClosure: (()->())?
     var showAlertClosure: (()->())?
     var updateLoadingStatus: (()->())?
-    var downloadedImageClosure: (()->())?
-    
+        
     init( apiService: APIServiceProtocol = APIService()) {
         self.apiService = apiService
     }
